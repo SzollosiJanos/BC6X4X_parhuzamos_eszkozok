@@ -11,7 +11,6 @@
 
 
 #include "BC6X4X_kernel.cl"
-#define SZOVEG "Encrypted by: Szöllősi János(BC6X4X)\n"
 #define FILEFORMAT ".bc6x4x"
 
 int main(int argc, char **argv) {
@@ -26,7 +25,7 @@ int main(int argc, char **argv) {
     struct dirent* in_file;
     FILE    *entry_file,*output;
 	char filename[255],outputname[100];
-	int key=atoi(argv[2]),mode=atoi(argv[3]),inputsize,szovegsize,i;
+	int key=atoi(argv[2]),mode=atoi(argv[3]),inputsize,i;
 	cl_kernel kernel;
 	
 	
@@ -96,8 +95,6 @@ int main(int argc, char **argv) {
         if (fread(inputfield,1, inputsize, entry_file) != NULL)
         {
 			clSetKernelArg(kernel, 0, sizeof(cl_mem), (void*)&device_buffer);
-			szovegsize=strlen(SZOVEG);
-			clSetKernelArg(kernel, 1, sizeof(int), (void*)&szovegsize);
 			clSetKernelArg(kernel, 2, sizeof(int), (void*)&key);
 			cl_command_queue command_queue = clCreateCommandQueue(context, device_id, NULL, NULL);
 	
@@ -109,13 +106,7 @@ int main(int argc, char **argv) {
 
 			clEnqueueNDRangeKernel(command_queue,kernel,1,NULL,&global_work_size,&local_work_size,0,NULL,NULL);
 			clEnqueueReadBuffer(command_queue,device_buffer,CL_TRUE,0,inputsize * sizeof(char),inputfield,0,NULL,NULL);
-			if(mode==1){
-				fwrite(SZOVEG,1,strlen(SZOVEG),output);
-				fwrite(inputfield,1,inputsize,output);
-			}else{
-				fwrite(inputfield,1,inputsize-szovegsize,output);
-			}
-			
+			fwrite(inputfield,1,inputsize,output);
         }
 		strcpy(filename,"");
 		strcat(filename,argv[1]);

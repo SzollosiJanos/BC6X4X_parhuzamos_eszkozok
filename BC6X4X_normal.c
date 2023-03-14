@@ -8,11 +8,10 @@
 #include <time.h>
 #include <sys/time.h>
 
-#define SZOVEG "Encrypted by: Szöllősi János(BC6X4X)\n"
 #define FILEFORMAT ".bc6x4x"
 
 void encrypt(char* buffer,int size, int key);
-void decrypt(char* buffer,int size, int key,int from);
+void decrypt(char* buffer,int size, int key);
 
 
 int main(int argc, char **argv) {
@@ -23,7 +22,7 @@ int main(int argc, char **argv) {
     struct dirent* in_file;
     FILE    *entry_file,*output;
 	char filename[255],outputname[100];
-	int key=atoi(argv[2]),mode=atoi(argv[3]),inputsize,szovegsize,i;
+	int key=atoi(argv[2]),mode=atoi(argv[3]),inputsize,i;
 	struct timeval stop, start;
 	gettimeofday(&start, NULL);
 	if (NULL == (FD = opendir (argv[1]))) 
@@ -65,15 +64,12 @@ int main(int argc, char **argv) {
         }
         if (fread(inputfield,1, inputsize, entry_file) != NULL)
         {
-			szovegsize=strlen(SZOVEG);
 			if(mode==1){
 				encrypt(inputfield,inputsize,key);
-				fwrite(SZOVEG,1,strlen(SZOVEG),output);
-				fwrite(inputfield,1,inputsize,output);
 			}else{
-				decrypt(inputfield,inputsize,key,strlen(SZOVEG));
-				fwrite(inputfield,1,inputsize-szovegsize,output);
+				decrypt(inputfield,inputsize,key);
 			}
+			fwrite(inputfield,1,inputsize,output);
 			
         }
 		strcpy(filename,"");
@@ -99,14 +95,12 @@ void encrypt(char* buffer,int size, int key){
 	}
 }
 
-void decrypt(char* buffer,int size, int key,int from){
+void decrypt(char* buffer,int size, int key){
 	for(int i=0;i<size;i++){
 		if(key==1){
 			buffer[i]-=13;
 		}else if(key==2){
-			if(i>=from){
-				buffer[i-from]=buffer[i]-(i-from);
-			}
+			buffer[i]-=i;
 		}
 	}
 }
