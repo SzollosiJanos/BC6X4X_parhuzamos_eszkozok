@@ -52,10 +52,11 @@ int main(int argc, char **argv) {
         return 0;
     }
 	
-	struct timeval stop, start;
-	gettimeofday(&start, NULL);
+	clock_t start, end,temp;
+	start = clock();
     while ((in_file = readdir(FD))) 
     {
+		temp = clock();
         if (!strcmp (in_file->d_name, "."))
             continue;
         if (!strcmp (in_file->d_name, ".."))    
@@ -65,8 +66,8 @@ int main(int argc, char **argv) {
 		strcpy(filename,"");
 		strcat(filename,argv[1]);
 		strcat(filename,in_file->d_name);
-		printf("%s\n\n",filename);
 		entry_file = fopen(filename, "rb");
+		printf("Filename:\t%s\n",filename);
 		if(mode==2&&strstr(filename,FILEFORMAT)){
 			filename[strlen(filename)-strlen(FILEFORMAT)]='\0';
 			strcpy(outputname, filename);
@@ -83,6 +84,7 @@ int main(int argc, char **argv) {
         
 		fseek(entry_file, 0L, SEEK_END);
 		inputsize = ftell(entry_file);
+		printf("Filesize:\t%d\n",inputsize);
 		fseek(entry_file, 0L ,SEEK_SET);
 		unsigned char *inputfield=(char*)malloc(inputsize*sizeof(char));
 		cl_mem device_buffer = clCreateBuffer(context, CL_MEM_READ_WRITE, inputsize * sizeof(char), NULL, NULL);
@@ -95,7 +97,7 @@ int main(int argc, char **argv) {
         if (fread(inputfield,1, inputsize, entry_file) != NULL)
         {
 			clSetKernelArg(kernel, 0, sizeof(cl_mem), (void*)&device_buffer);
-			clSetKernelArg(kernel, 2, sizeof(int), (void*)&key);
+			clSetKernelArg(kernel, 1, sizeof(int), (void*)&key);
 			cl_command_queue command_queue = clCreateCommandQueue(context, device_id, NULL, NULL);
 	
 			clEnqueueWriteBuffer(command_queue,device_buffer,CL_FALSE,0,inputsize * sizeof(char),inputfield,0,NULL,NULL);
@@ -115,10 +117,12 @@ int main(int argc, char **argv) {
 		fclose(output);
 		remove(filename);
 		free(inputfield);
+		end = clock();
+		printf("Runtime:\t%lf\n\n",  ((double)(end - temp))/CLOCKS_PER_SEC); 
     }
-	gettimeofday(&stop, NULL);
-	printf("took %d.%d sec\n", ((stop.tv_sec - start.tv_sec) * 1000000 + stop.tv_usec - start.tv_usec)/1000000,((stop.tv_sec - start.tv_sec) * 1000000 + stop.tv_usec - start.tv_usec)%1000); 
-    clReleaseKernel(kernel);
+	end = clock();
+	printf("\n\nOverall runtime:\t%lf\n",  ((double)(end - start))/CLOCKS_PER_SEC); 
+	clReleaseKernel(kernel);
     clReleaseProgram(program);
     clReleaseContext(context);
     clReleaseDevice(device_id);

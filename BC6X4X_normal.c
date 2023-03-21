@@ -23,8 +23,8 @@ int main(int argc, char **argv) {
     FILE    *entry_file,*output;
 	char filename[255],outputname[100];
 	int key=atoi(argv[2]),mode=atoi(argv[3]),inputsize,i;
-	struct timeval stop, start;
-	gettimeofday(&start, NULL);
+	clock_t start, end,temp;
+	start = clock();
 	if (NULL == (FD = opendir (argv[1]))) 
     {
         fprintf(stderr, "Error : Failed to open input directory - %s\n", strerror(errno));
@@ -32,6 +32,7 @@ int main(int argc, char **argv) {
     }
     while ((in_file = readdir(FD))) 
     {
+		temp = clock();
         if (!strcmp (in_file->d_name, "."))
             continue;
         if (!strcmp (in_file->d_name, ".."))    
@@ -41,7 +42,7 @@ int main(int argc, char **argv) {
 		strcpy(filename,"");
 		strcat(filename,argv[1]);
 		strcat(filename,in_file->d_name);
-		printf("%s\n\n",filename);
+		printf("Filename:\t%s\n",filename);
 		entry_file = fopen(filename, "rb");
 		if(mode==2&&strstr(filename,FILEFORMAT)){
 			filename[strlen(filename)-strlen(FILEFORMAT)]='\0';
@@ -55,6 +56,7 @@ int main(int argc, char **argv) {
 		output=fopen(outputname,"wb");
 		fseek(entry_file, 0L, SEEK_END);
 		inputsize = ftell(entry_file);
+		printf("Filesize:\t%d\n",inputsize);
 		fseek(entry_file, 0L ,SEEK_SET);
 		unsigned char *inputfield=(char*)malloc(inputsize*sizeof(char));
         if (entry_file == NULL)
@@ -79,9 +81,11 @@ int main(int argc, char **argv) {
 		fclose(output);
 		remove(filename);
 		free(inputfield);
-    }
-	gettimeofday(&stop, NULL);
-	printf("took %d.%d sec\n", ((stop.tv_sec - start.tv_sec) * 1000000 + stop.tv_usec - start.tv_usec)/1000000,((stop.tv_sec - start.tv_sec) * 1000000 + stop.tv_usec - start.tv_usec)%1000); 
+		end = clock();
+		printf("Runtime:\t%lf\n\n",  ((double)(end - temp))/CLOCKS_PER_SEC); 
+	}
+	end = clock();
+	printf("\n\nOverall runtime:\t%lf\n",  ((double)(end - start))/CLOCKS_PER_SEC); 
 }
 
 
