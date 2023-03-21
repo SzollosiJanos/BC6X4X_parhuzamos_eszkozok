@@ -12,6 +12,7 @@
 
 #include "BC6X4X_kernel.cl"
 #define FILEFORMAT ".bc6x4x"
+#define SZOVEG "Encrypted by: Szöllősi János (BC6X4X)\n"
 
 int main(int argc, char **argv) {
 	if(argc!=4){
@@ -84,8 +85,15 @@ int main(int argc, char **argv) {
         
 		fseek(entry_file, 0L, SEEK_END);
 		inputsize = ftell(entry_file);
+		if(mode==1){
+			fwrite(SZOVEG,1,strlen(SZOVEG),output);
+			fseek(entry_file, 0L ,SEEK_SET);
+		}else{
+			fseek(entry_file, strlen(SZOVEG) ,SEEK_SET);
+			inputsize-=strlen(SZOVEG);
+		}
+		
 		printf("Filesize:\t%d\n",inputsize);
-		fseek(entry_file, 0L ,SEEK_SET);
 		unsigned char *inputfield=(char*)malloc(inputsize*sizeof(char));
 		cl_mem device_buffer = clCreateBuffer(context, CL_MEM_READ_WRITE, inputsize * sizeof(char), NULL, NULL);
         if (entry_file == NULL)

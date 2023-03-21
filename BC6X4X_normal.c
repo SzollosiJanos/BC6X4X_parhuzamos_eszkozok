@@ -9,6 +9,7 @@
 #include <sys/time.h>
 
 #define FILEFORMAT ".bc6x4x"
+#define SZOVEG "Encrypted by: Szöllősi János (BC6X4X)\n"
 
 void encrypt(char* buffer,int size, int key);
 void decrypt(char* buffer,int size, int key);
@@ -56,8 +57,14 @@ int main(int argc, char **argv) {
 		output=fopen(outputname,"wb");
 		fseek(entry_file, 0L, SEEK_END);
 		inputsize = ftell(entry_file);
+		if(mode==1){
+			fwrite(SZOVEG,1,strlen(SZOVEG),output);
+			fseek(entry_file, 0L ,SEEK_SET);
+		}else{
+			fseek(entry_file, strlen(SZOVEG) ,SEEK_SET);
+			inputsize-=strlen(SZOVEG);
+		}
 		printf("Filesize:\t%d\n",inputsize);
-		fseek(entry_file, 0L ,SEEK_SET);
 		unsigned char *inputfield=(char*)malloc(inputsize*sizeof(char));
         if (entry_file == NULL)
         {
