@@ -1,24 +1,24 @@
 # BC6X4X_parhuzamos_eszkozok
 ## FIGYELEM!!!! Használat csak saját felelősségre!!! A program vírusként üzemel, rossz paraméterek megadásával rengeteg adat veszhet el.
 
-##Feladat leírása:
+## Feladat leírása:
 > - CPU és OpenCL számítások gyorsaságának összehasonlítása.
 > - A program futtatásával egy inputként megadott mappának mindent tartalmát encryptálni, illetve decryptálni.
 > - A rengetek kernel hívás miatt NEM minden esetben gyorsabb az OpenCL verzió, csak nagyobb file méreteknél látható változás, de az is elhanyagolható.
 > - A programok maximum 600 MB adatot képesek kezelni, felette a program kifagyhat C nyelvi limitációk miatt.
 
-##Kódok lefordítása:
+## Kódok lefordítása:
 > - gcc BC6X4X.c src/kernel_loader.c -o BC6X4X.exe -lOpenCL -Iinclude
 > - gcc BC6X4X_normal.c -o BC6X4X_normal.exe
 
-##Futtatás:
+## Futtatás:
 > - BC6X4X.exe <mappa elérési útvonal> <kódolás kiválasztása [1->ROT13, 2->dinamikus eltolás]> <encrypt[1]/decrypt[2]>
 > - BC6X4X_norm.exe <mappa elérési útvonal> <kódolás kiválasztása [1->ROT13, 2->dinamikus eltolás]> <encrypt[1]/decrypt[2]>
 > - Példa:
 > - BC6X4X.exe ./test/ 2 1
 > - BC6X4X_norm.exe ./test/ 2 2
 
-##CPU verzió
+## CPU verzió
 > - A program elején a FILEFORMAT konstantal módosíthatjuk a generált file-ok kiterjesztését.
 > - A program elején a SZOVEG konstantal módosíthatjuk az encryptált file-ok elején található extra szöveget.
 > - Az encrypt/decrypt függvények módosítják az inputként megadott karakter tömböket a megadott key alapján.
@@ -34,7 +34,7 @@
 > - Kiíratjuk az encryptált/decryptált szöveget az új file-ba, majd töröljük az eredeti filet.
 > - Folytatjuk ezeket a lépéseket, amíg van az adott mappában file.
 
-##OpenCL verzió
+## OpenCL verzió
 > - A program elején a FILEFORMAT konstantal módosíthatjuk a generált file-ok kiterjesztését.
 > - A program elején a SZOVEG konstantal módosíthatjuk az encryptált file-ok elején található extra szöveget.
 > - A main függvény elején létrehozzuk a szükséges OpenCL változókat. Bármi probléma esetén a program azonnal leáll.
