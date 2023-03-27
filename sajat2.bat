@@ -1,3 +1,3 @@
 SET PATH=%PATH%;%cd%\MinGW\bin
-gcc BC6X4X.c -o BC6X4X.exe -lOpenCL && BC6X4X.exe ./test/ 2 2
+gcc BC6X4X.c src/kernel_loader.c -o BC6X4X.exe -lOpenCL -Iinclude && BC6X4X.exe ./test/ 2 2
 cmd

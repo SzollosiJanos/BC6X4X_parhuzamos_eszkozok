@@ -8,9 +8,9 @@
 #include <errno.h>
 #include <time.h>
 #include <sys/time.h>
+#include "kernel_loader.h"
 
 
-#include "BC6X4X_kernel.cl"
 #define FILEFORMAT ".bc6x4x"
 #define SZOVEG "Encrypted by: Szöllősi János (BC6X4X)\n"
 
@@ -46,6 +46,12 @@ int main(int argc, char **argv) {
 		return 0;
 	}
     cl_context context = clCreateContext(NULL, n_devices, &device_id, NULL, NULL, NULL);
+	// Create the kernel program and build it
+    const char * kernel_code = load_kernel_source("kernels/BC6X4X_kernel.cl", & err);
+    if (err != 0) {
+        printf("Source code loading error!\n");
+        return 0;
+    }
 	cl_program program = clCreateProgramWithSource(context, 1, &kernel_code, NULL, NULL);
     err = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
     if (err != CL_SUCCESS) {
